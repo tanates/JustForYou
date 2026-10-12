@@ -1,0 +1,422 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Вечер для двоих</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,500;0,600;1,500;1,600&family=Manrope:wght@400;500;600;700&family=Caveat:wght@600&display=swap">
+<style>
+/* Layout: one narrow column, left-aligned. Hero, then a three-step flow (what / when / wishes) that swaps in place. */
+:root {
+  --bg: #f8f1f2;
+  --surface: #fffafa;
+  --fg: #2b1822;
+  --muted: #7a6270;
+  --line: #e6d3d8;
+  --accent: #b82a4a;
+  --accent-ink: #ffffff;
+  --accent-soft: #f6dde3;
+  --gold: #b3801f;
+  --ok: #2f7d59;
+  --font-display: "Lora", Georgia, "Times New Roman", serif;
+  --font-body: "Manrope", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-hand: "Caveat", "Segoe Script", cursive;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #170f16; --surface: #221620; --fg: #f6e9ee; --muted: #b69aa8; --line: #3b2a37;
+    --accent: #ff6f8e; --accent-ink: #2a0b15; --accent-soft: #3a1c29; --gold: #e3b657; --ok: #6fcf9f;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #170f16; --surface: #221620; --fg: #f6e9ee; --muted: #b69aa8; --line: #3b2a37;
+  --accent: #ff6f8e; --accent-ink: #2a0b15; --accent-soft: #3a1c29; --gold: #e3b657; --ok: #6fcf9f;
+  color-scheme: dark;
+}
+
+* { box-sizing: border-box; }
+body {
+  background: var(--bg); color: var(--fg);
+  font-family: var(--font-body); font-size: 16px; line-height: 1.55;
+  padding-inline: 18px; padding-block: 40px 72px;
+}
+.wrap { max-width: 680px; margin-inline: auto; display: flex; flex-direction: column; gap: 32px; }
+h1, h2, h3 { font-family: var(--font-display); font-weight: 600; margin: 0; text-wrap: balance; }
+p { margin: 0; }
+button, input, textarea { font: inherit; color: inherit; }
+:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
+
+/* hero */
+.hero { display: flex; flex-direction: column; gap: 14px; }
+.hand { font-family: var(--font-hand); font-size: 26px; color: var(--accent); line-height: 1; }
+.hero h1 { font-size: clamp(36px, 8.5vw, 58px); line-height: 1.05; font-style: italic; letter-spacing: -0.01em; }
+.hero p { color: var(--muted); max-width: 52ch; font-size: 17px; }
+
+/* stepper */
+.steps { display: flex; gap: 8px; list-style: none; margin: 0; padding: 0; }
+.steps li { flex: 1; display: flex; flex-direction: column; gap: 6px; font-size: 13px; font-weight: 600; letter-spacing: .04em; text-transform: uppercase; color: var(--muted); }
+.steps li::before { content: ""; height: 4px; border-radius: 4px; background: var(--line); transition: background .25s; }
+.steps li.done::before, .steps li.now::before { background: var(--accent); }
+.steps li.now { color: var(--fg); }
+
+.panel { display: flex; flex-direction: column; gap: 20px; animation: rise .35s ease both; }
+@keyframes rise { from { opacity: .2; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+.panel h2 { font-size: 26px; line-height: 1.2; }
+.panel .lead { color: var(--muted); margin-top: -12px; }
+
+/* option cards */
+.options { display: flex; flex-direction: column; gap: 12px; }
+.opt { position: relative; }
+.opt input { position: absolute; opacity: 0; inset: 0; cursor: pointer; }
+.opt label {
+  display: grid; grid-template-columns: 48px 1fr 24px; gap: 16px; align-items: center;
+  padding: 16px 18px; background: var(--surface); border: 1.5px solid var(--line); border-radius: 14px;
+  transition: border-color .2s, background .2s, transform .2s;
+}
+.opt label:hover { border-color: var(--accent); }
+.opt input:focus-visible + label { outline: 3px solid var(--accent); outline-offset: 2px; }
+.opt input:checked + label { border-color: var(--accent); background: var(--accent-soft); }
+.opt .ico { width: 48px; height: 48px; border-radius: 50%; display: grid; place-items: center; background: var(--bg); color: var(--accent); }
+.opt input:checked + label .ico { background: var(--accent); color: var(--accent-ink); }
+.opt .ico svg { width: 26px; height: 26px; }
+.opt .txt { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.opt .name { font-family: var(--font-display); font-weight: 600; font-size: 19px; line-height: 1.25; }
+.opt .desc { color: var(--muted); font-size: 14.5px; }
+.opt .tick { width: 24px; height: 24px; border-radius: 50%; border: 1.5px solid var(--line); display: grid; place-items: center; color: transparent; }
+.opt input:checked + label .tick { background: var(--accent); border-color: var(--accent); color: var(--accent-ink); }
+.tick svg { width: 14px; height: 14px; }
+
+/* fields */
+.field { display: flex; flex-direction: column; gap: 8px; }
+.field > span, .field > legend { font-size: 13px; font-weight: 700; letter-spacing: .05em; text-transform: uppercase; color: var(--muted); }
+fieldset.field { border: 0; padding: 0; margin: 0; min-width: 0; }
+input[type="date"], textarea {
+  width: 100%; background: var(--surface); border: 1.5px solid var(--line); border-radius: 12px; padding: 13px 14px;
+}
+input[type="date"] { max-width: 280px; }
+textarea { min-height: 150px; resize: vertical; line-height: 1.5; }
+input[type="date"]:focus, textarea:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-soft); }
+.chips { display: flex; flex-wrap: wrap; gap: 8px; }
+.chip {
+  border: 1.5px solid var(--line); background: var(--surface); border-radius: 999px; padding: 8px 15px; cursor: pointer;
+  font-size: 14.5px; font-weight: 500; transition: border-color .2s, background .2s;
+}
+.chip:hover { border-color: var(--accent); }
+.chip[aria-pressed="true"] { background: var(--accent); border-color: var(--accent); color: var(--accent-ink); }
+.chip.add::before { content: "+ "; color: var(--accent); font-weight: 700; }
+
+/* nav */
+.nav { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }
+.btn {
+  border: 0; border-radius: 12px; padding: 14px 24px; font-weight: 700; cursor: pointer;
+  background: var(--accent); color: var(--accent-ink); transition: transform .15s, opacity .2s;
+}
+.btn:hover:not(:disabled) { transform: translateY(-1px); }
+.btn:disabled { opacity: .4; cursor: not-allowed; }
+.btn.ghost { background: transparent; color: var(--fg); border: 1.5px solid var(--line); }
+.btn.small { padding: 9px 16px; font-size: 14px; }
+.note { color: var(--muted); font-size: 14px; }
+.err { color: var(--accent); font-size: 14.5px; }
+
+/* done */
+.done-card { background: var(--surface); border: 1.5px solid var(--line); border-radius: 16px; padding: 22px; display: flex; flex-direction: column; gap: 14px; }
+.sum { display: grid; grid-template-columns: max-content 1fr; gap: 8px 18px; margin: 0; }
+.sum dt { color: var(--muted); font-size: 13px; font-weight: 700; letter-spacing: .05em; text-transform: uppercase; padding-top: 3px; }
+.sum dd { margin: 0; min-width: 0; overflow-wrap: anywhere; }
+.sum dd.wish { white-space: pre-wrap; }
+.stamp { font-family: var(--font-hand); font-size: 30px; color: var(--accent); line-height: 1.1; }
+.status { font-size: 14.5px; }
+.status.ok { color: var(--ok); }
+
+/* author panel */
+.author { border-top: 1.5px dashed var(--line); padding-top: 24px; display: flex; flex-direction: column; gap: 16px; }
+.author h2 { font-size: 22px; }
+.answers { display: flex; flex-direction: column; gap: 12px; }
+.ans { background: var(--surface); border: 1.5px solid var(--line); border-radius: 14px; padding: 16px 18px; display: flex; flex-direction: column; gap: 10px; }
+.ans-top { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wrap; align-items: baseline; }
+.ans-top .name { font-family: var(--font-display); font-weight: 600; font-size: 19px; }
+.ans-top time { color: var(--muted); font-size: 13px; }
+.tag { display: inline-block; font-size: 12px; font-weight: 700; padding: 2px 9px; border-radius: 999px; background: var(--accent-soft); color: var(--accent); margin-left: 8px; vertical-align: 2px; }
+.ans .when { font-weight: 600; }
+.ans .wish { white-space: pre-wrap; overflow-wrap: anywhere; color: var(--fg); }
+.ans .wish.none { color: var(--muted); font-style: italic; }
+.empty { color: var(--muted); padding: 18px; border: 1.5px dashed var(--line); border-radius: 14px; }
+
+@media (max-width: 480px) {
+  body { padding-block: 28px 56px; }
+  .opt label { grid-template-columns: 40px 1fr 22px; gap: 12px; padding: 14px; }
+  .opt .ico { width: 40px; height: 40px; }
+  .opt .ico svg { width: 22px; height: 22px; }
+  .sum { grid-template-columns: 1fr; gap: 2px; }
+  .sum dd { margin-bottom: 10px; }
+  .btn { flex: 1 1 auto; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .panel { animation: none; }
+  * { transition: none !important; }
+}
+[hidden]{display:none!important}
+body{margin:0}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="hero">
+    <span class="hand">для тебя</span>
+    <h1>Пойдём на свидание?</h1>
+    <p>Я придумал пять вариантов. Выбери тот, что нравится больше всего, потом назначим день и ты напишешь, что хочешь добавить.</p>
+  </header>
+
+  <ol class="steps" id="steps" aria-label="Шаги">
+    <li data-s="1">Куда</li>
+    <li data-s="2">Когда</li>
+    <li data-s="3">Пожелания</li>
+  </ol>
+
+  <main id="stage"></main>
+
+</div>
+
+<script>
+(function () {
+  // Настройки Telegram. Заполни перед публикацией (см. инструкцию в чате).
+  var TG_TOKEN = "PASTE_BOT_TOKEN_HERE";
+  var TG_CHAT_ID = "8805026945";
+
+  var OPTIONS = [
+    { id: "cinema", name: "Кино и прогулка по ТЦ", desc: "Выбираем фильм, берём попкорн, потом гуляем по магазинам без плана.",
+      icon: '<path d="M3 8a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v2a2 2 0 0 0 0 4v2a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-2a2 2 0 0 0 0-4z"/><path d="M14 6v12" stroke-dasharray="2 2.5"/>' },
+    { id: "dinner", name: "Ужин вместе и сериал", desc: "Готовим что-нибудь вдвоём, потом включаем сериал и не встаём с дивана.",
+      icon: '<path d="M4 11h16v2a6 6 0 0 1-6 6h-4a6 6 0 0 1-6-6z"/><path d="M2 11h2M20 11h2"/><path d="M9 7c0-1.2 1-1.2 1-2.4M13 7c0-1.2 1-1.2 1-2.4"/>' },
+    { id: "place", name: "Место, где мы познакомились", desc: "Возвращаемся туда, откуда всё началось, и вспоминаем тот день.",
+      icon: '<path d="M12 21s-6.5-5.6-6.5-11a6.5 6.5 0 0 1 13 0c0 5.4-6.5 11-6.5 11z"/><circle cx="12" cy="10" r="2.4"/>' },
+    { id: "walk", name: "Прогулка с остановками в кафе", desc: "Идём куда глаза глядят и заходим в кафе, где вкусно пахнет.",
+      icon: '<path d="M5 9h11v5a4 4 0 0 1-4 4H9a4 4 0 0 1-4-4z"/><path d="M16 10h1.5a2.5 2.5 0 0 1 0 5H16"/><path d="M8 5.5c0-1 .8-1 .8-2M12 5.5c0-1 .8-1 .8-2"/>' },
+    { id: "theatre", name: "Поход в театр", desc: "Нарядимся, посмотрим спектакль, а в антракте обсудим всё, что увидели.",
+      icon: '<path d="M4 5h10v6a5 5 0 0 1-10 0z"/><path d="M7 9v.01M11 9v.01M7 12.5q2 1.4 4 0"/><path d="M14 8h6v6a5 5 0 0 1-8.5 3.5"/>' }
+  ];
+  var PARTS = [
+    { id: "day", label: "Днём" },
+    { id: "evening", label: "Вечером" },
+    { id: "any", label: "Как скажешь" }
+  ];
+  var WISHES = ["Без спешки", "Хочу сюрприз", "Что-нибудь вкусное", "Напиши заранее", "Давай сфоткаемся"];
+
+  var state = { step: 1, option: null, date: "", part: "evening", wish: "", sent: null, sentNote: "" };
+  var stage = document.getElementById("stage");
+  var stepsEl = document.getElementById("steps");
+
+  function el(tag, attrs, kids) {
+    var n = document.createElement(tag);
+    if (attrs) for (var k in attrs) {
+      if (k === "text") n.textContent = attrs[k];
+      else if (k === "html") n.innerHTML = attrs[k];
+      else if (k.slice(0, 2) === "on") n.addEventListener(k.slice(2), attrs[k]);
+      else n.setAttribute(k, attrs[k]);
+    }
+    (kids || []).forEach(function (c) { if (c) n.appendChild(c); });
+    return n;
+  }
+  function svg(inner, cls) {
+    return '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' + inner + "</svg>";
+  }
+  function byId(list, id) { return list.filter(function (x) { return x.id === id; })[0]; }
+  function pad(n) { return (n < 10 ? "0" : "") + n; }
+  function iso(d) { return d.getFullYear() + "-" + pad(d.getMonth() + 1) + "-" + pad(d.getDate()); }
+  function parseIso(s) { var p = s.split("-"); return new Date(+p[0], +p[1] - 1, +p[2]); }
+  function longDate(s) {
+    if (!s) return "";
+    return parseIso(s).toLocaleDateString("ru-RU", { weekday: "long", day: "numeric", month: "long" });
+  }
+  function nextWeekday(dow) {
+    var d = new Date(); d.setHours(12, 0, 0, 0);
+    do { d.setDate(d.getDate() + 1); } while (d.getDay() !== dow);
+    return iso(d);
+  }
+  function partText(id) { return (byId(PARTS, id) || {}).label || ""; }
+
+  function summaryText() {
+    var o = byId(OPTIONS, state.option);
+    var lines = ["Вот что я выбрала для нашего свидания:",
+      "Куда: " + (o ? o.name : "—"),
+      "Когда: " + longDate(state.date) + ", " + partText(state.part).toLowerCase()];
+    if (state.wish.trim()) lines.push("Пожелания: " + state.wish.trim());
+    return lines.join("\n");
+  }
+
+  function renderSteps() {
+    Array.prototype.forEach.call(stepsEl.children, function (li) {
+      var s = +li.getAttribute("data-s");
+      li.className = state.sent ? "done" : (s < state.step ? "done" : s === state.step ? "now" : "");
+    });
+  }
+
+  /* step 1 */
+  function viewOptions() {
+    var list = el("div", { class: "options", role: "radiogroup", "aria-label": "Варианты свидания" });
+    OPTIONS.forEach(function (o) {
+      var id = "opt-" + o.id;
+      var input = el("input", { type: "radio", name: "option", id: id, value: o.id });
+      if (state.option === o.id) input.checked = true;
+      input.addEventListener("change", function () { state.option = o.id; next.disabled = false; });
+      var label = el("label", { for: id }, [
+        el("span", { class: "ico", html: svg(o.icon) }),
+        el("span", { class: "txt" }, [el("span", { class: "name", text: o.name }), el("span", { class: "desc", text: o.desc })]),
+        el("span", { class: "tick", html: svg('<path d="M5 12.5l4.5 4.5L19 7.5"/>') })
+      ]);
+      list.appendChild(el("div", { class: "opt" }, [input, label]));
+    });
+    var next = el("button", { class: "btn", id: "next1", type: "button", text: "Дальше", onclick: function () { go(2); } });
+    next.disabled = !state.option;
+    return el("div", { class: "panel" }, [
+      el("h2", { text: "Куда пойдём?" }),
+      el("p", { class: "lead", text: "Выбери один вариант." }),
+      list,
+      el("div", { class: "nav" }, [next])
+    ]);
+  }
+
+  /* step 2 */
+  function viewWhen() {
+    var o = byId(OPTIONS, state.option);
+    var dateInput = el("input", { type: "date", id: "date", min: iso(new Date()) });
+    dateInput.value = state.date;
+    var next = el("button", { class: "btn", type: "button", text: "Дальше", onclick: function () { go(3); } });
+    next.disabled = !state.date;
+    var quickWrap = el("div", { class: "chips" });
+    function paintQuick() {
+      quickWrap.textContent = "";
+      [["В пятницу", 5], ["В субботу", 6], ["В воскресенье", 0]].forEach(function (q) {
+        var v = nextWeekday(q[1]);
+        quickWrap.appendChild(el("button", { class: "chip", type: "button", "aria-pressed": String(state.date === v), text: q[0], onclick: function () {
+          state.date = v; dateInput.value = v; next.disabled = false; paintQuick();
+        } }));
+      });
+    }
+    paintQuick();
+    dateInput.addEventListener("input", function () { state.date = dateInput.value; next.disabled = !state.date; paintQuick(); });
+
+    var partWrap = el("div", { class: "chips", role: "radiogroup", "aria-label": "Время дня" });
+    function paintParts() {
+      partWrap.textContent = "";
+      PARTS.forEach(function (p) {
+        partWrap.appendChild(el("button", { class: "chip", type: "button", role: "radio", "aria-checked": String(state.part === p.id), "aria-pressed": String(state.part === p.id), text: p.label, onclick: function () { state.part = p.id; paintParts(); } }));
+      });
+    }
+    paintParts();
+
+    return el("div", { class: "panel" }, [
+      el("h2", { text: "Когда тебе удобно?" }),
+      el("p", { class: "lead", text: "Ты выбрала: " + (o ? o.name.toLowerCase() : "") + "." }),
+      el("div", { class: "field" }, [el("span", { text: "Быстрый выбор" }), quickWrap]),
+      el("label", { class: "field", for: "date" }, [el("span", { text: "Или любая другая дата" }), dateInput]),
+      el("div", { class: "field" }, [el("span", { text: "Время дня" }), partWrap]),
+      el("div", { class: "nav" }, [
+        el("button", { class: "btn ghost", type: "button", text: "Назад", onclick: function () { go(1); } }),
+        next
+      ])
+    ]);
+  }
+
+  /* step 3 */
+  function viewWish() {
+    var ta = el("textarea", { id: "wish", maxlength: "1000", placeholder: "Например: хочу, чтобы мы никуда не торопились…" });
+    ta.value = state.wish;
+    ta.addEventListener("input", function () { state.wish = ta.value; });
+    var chips = el("div", { class: "chips" });
+    WISHES.forEach(function (w) {
+      chips.appendChild(el("button", { class: "chip add", type: "button", text: w, onclick: function () {
+        var cur = ta.value.trim();
+        if (cur.indexOf(w) !== -1) return;
+        ta.value = cur ? cur + (/[.!?]$/.test(cur) ? " " : ". ") + w : w;
+        state.wish = ta.value; ta.focus();
+      } }));
+    });
+    var errBox = el("p", { class: "err", role: "alert", hidden: "" });
+    var send = el("button", { class: "btn", type: "button", id: "send", text: "Отправить ответ", onclick: function () { submit(send, errBox); } });
+    return el("div", { class: "panel" }, [
+      el("h2", { text: "Что хочешь добавить?" }),
+      el("p", { class: "lead", text: "Любые пожелания к этому вечеру. Можно оставить пустым." }),
+      el("label", { class: "field", for: "wish" }, [el("span", { text: "Твои пожелания" }), ta]),
+      el("div", { class: "field" }, [el("span", { text: "Можно добавить" }), chips]),
+      errBox,
+      el("div", { class: "nav" }, [
+        el("button", { class: "btn ghost", type: "button", text: "Назад", onclick: function () { go(2); } }),
+        send
+      ])
+    ]);
+  }
+
+  /* done */
+  function viewDone() {
+    var o = byId(OPTIONS, state.option);
+    var dl = el("dl", { class: "sum" }, [
+      el("dt", { text: "Куда" }), el("dd", { text: o ? o.name : "" }),
+      el("dt", { text: "Когда" }), el("dd", { text: longDate(state.date) + ", " + partText(state.part).toLowerCase() }),
+      el("dt", { text: "Пожелания" }), el("dd", { class: "wish", text: state.wish.trim() || "Без пожеланий" })
+    ]);
+    var status = el("p", { class: "status" + (state.sent === "saved" ? " ok" : ""), text: state.sentNote });
+    var copyMsg = el("span", { class: "note" });
+    var copyBtn = el("button", { class: "btn small" + (state.sent === "saved" ? " ghost" : ""), type: "button", text: "Скопировать ответ", onclick: function () {
+      var t = summaryText();
+      function fallback() {
+        var ta = el("textarea", { readonly: "", "aria-label": "Текст ответа" }); ta.value = t; ta.style.minHeight = "120px";
+        copyMsg.textContent = ""; copyMsg.appendChild(ta); ta.focus(); ta.select();
+      }
+      try { navigator.clipboard.writeText(t).then(function () { copyMsg.textContent = "Скопировано."; }, fallback); } catch (e) { fallback(); }
+    } });
+    var nodes = [
+      el("span", { class: "stamp", text: state.sent === "saved" ? "Договорились!" : "Почти готово" }),
+      el("h2", { text: state.sent === "saved" ? "Спасибо, я всё получил" : "Осталось отправить ответ мне" }),
+      el("div", { class: "done-card" }, [dl, status]),
+      el("div", { class: "nav" }, [
+        el("button", { class: "btn ghost small", type: "button", text: "Изменить ответ", onclick: function () { state.sent = null; go(1); } }),
+        copyBtn, copyMsg
+      ])
+    ];
+    return el("div", { class: "panel" }, nodes);
+  }
+
+  function render() {
+    renderSteps();
+    stage.textContent = "";
+    stage.appendChild(state.sent ? viewDone() : state.step === 1 ? viewOptions() : state.step === 2 ? viewWhen() : viewWish());
+  }
+  function go(n) {
+    state.step = n; render();
+    var top = document.getElementById("steps");
+    if (top && top.scrollIntoView) top.scrollIntoView({ behavior: "smooth", block: "start" });
+  }
+
+  /* sending */
+  function configured() { return TG_TOKEN.indexOf("PASTE_") !== 0 && TG_CHAT_ID.indexOf("PASTE_") !== 0; }
+  async function submit(btn, errBox) {
+    errBox.hidden = true;
+    btn.disabled = true;
+    var saved = false;
+    if (configured()) {
+      try {
+        var res = await fetch("https://api.telegram.org/bot" + TG_TOKEN + "/sendMessage", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ chat_id: TG_CHAT_ID, text: "Ответ на приглашение\n\n" + summaryText().split("\n").slice(1).join("\n") })
+        });
+        var data = await res.json();
+        saved = !!(data && data.ok);
+      } catch (e) { saved = false; }
+    }
+    state.sent = saved ? "saved" : "manual";
+    state.sentNote = saved
+      ? "Твой ответ отправлен. Если захочешь поменять, выбери «Изменить ответ» и отправь ещё раз."
+      : "Не получилось отправить автоматически. Нажми «Скопировать ответ» и пришли мне сообщением.";
+    render();
+  }
+
+  render();
+})();
+</script>
+</body>
+</html>
